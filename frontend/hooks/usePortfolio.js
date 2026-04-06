@@ -2,14 +2,15 @@
 import { useState, useEffect } from 'react';
 import {
   buildPortfolio,
-  fetchPortfolio,
+  getPortfolio,
   savePortfolio,
   loadPortfolio,
 } from '../services/portfolioService';
 
 export function usePortfolio() {
   const [portfolio, setPortfolio] = useState(null);
-  const [loading,   setLoading]   = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const saved = loadPortfolio();
@@ -18,10 +19,12 @@ export function usePortfolio() {
     }
 
     async function hydrateFromBackend() {
-      const remote = await fetchPortfolio();
-      if (remote) {
+      try {
+        const remote = await getPortfolio();
         setPortfolio(remote);
         savePortfolio(remote);
+      } catch (_err) {
+        // Ignore on initial page load. We still have local fallback.
       }
     }
 
@@ -30,12 +33,19 @@ export function usePortfolio() {
 
   async function build(profileData) {
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200)); // short dramatic pause
-    const result = await buildPortfolio(profileData);
-    setPortfolio(result);
-    savePortfolio(result);
-    setLoading(false);
-    return result;
+    setError('');
+
+    try {
+      const result = await buildPortfolio(profileData);
+      setPortfolio(result);
+      savePortfolio(result);
+      return result;
+    } catch (_error) {
+      setError('Unable to build portfolio. Please try again.');
+      return null;
+    } finally {
+      setLoading(false);
+    }
   }
 
   function reset() {
@@ -43,5 +53,5 @@ export function usePortfolio() {
     if (typeof window !== 'undefined') localStorage.removeItem('vestiq_portfolio');
   }
 
-  return { portfolio, loading, build, reset };
+  return { portfolio, loading, error, build, reset };
 }
