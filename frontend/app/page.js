@@ -58,7 +58,22 @@ export default function LandingPage() {
     <>
       <Navbar />
       <main className="landing-wrap">
-        <section className="hero-panel">
+        <section className="section-nav" aria-label="Landing section navigation">
+          <a href="#home" className="btn btn-ghost btn-sm">
+            Home
+          </a>
+          <a href="#features" className="btn btn-ghost btn-sm">
+            Features
+          </a>
+          <a href="#how-it-works" className="btn btn-ghost btn-sm">
+            How It Works
+          </a>
+          <a href="#pricing" className="btn btn-ghost btn-sm">
+            Pricing
+          </a>
+        </section>
+
+        <section className="hero-panel" id="home">
           <div className="hero-layout">
             <div className="hero-content">
               <p className="hero-kicker">Vestiq Wealth Co-Pilot</p>
